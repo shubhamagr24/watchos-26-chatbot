@@ -52,7 +52,7 @@ SOURCES = [
 
 
 
-OUTPUT_FILE = "apple_watch_kb/kb_raw_data.json"
+OUTPUT_FILE = "apple_watch_kb/release_notes.json"
 
 async def create_knowledge_base():
     print(f"--- Step 1: Crawling {len(SOURCES)} sources ---")
