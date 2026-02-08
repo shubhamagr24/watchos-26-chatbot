@@ -2,13 +2,13 @@ services:
   - type: web
     name: backend-service
     runtime: python
-    buildCommand: "pip install -r backend/requirements.txt"
+    buildCommand: "uv install"
     startCommand: "uvicorn backend.main:app --host 0.0.0.0 --port 8000"
     plan: free
 
   - type: web
     name: frontend-service
     runtime: python
-    buildCommand: "pip install -r frontend/requirements.txt"
-    startCommand: "gunicorn frontend.app:app"
+    buildCommand: "uv install"
+    startCommand: "streamlit run app.py --server.port 8501 --server.address 0.0.0.0"
     plan: free
