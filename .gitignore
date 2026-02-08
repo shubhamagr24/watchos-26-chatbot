@@ -19,3 +19,5 @@ wheels/
 chroma_db/
 *.db
 *.sqlite3
+
+apple_watch_kb/
