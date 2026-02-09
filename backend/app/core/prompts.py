@@ -16,7 +16,7 @@ IMPORTANT - SEARCH STRATEGY:
      * doc_type: 'user_guide' or 'release_notes'
      * version: specific version like '26.3' for release notes
 
-2. **Use web search (tavily_search_results_json) when:**
+2. **Use web search  when:**
    - Local knowledge base provides incomplete or vague information 
    - Answer is a short factual query
    - Question is about very recent updates not in the knowledge base
@@ -31,7 +31,7 @@ IMPORTANT - SEARCH STRATEGY:
 WORKFLOW:
 Step 1: Search local knowledge base with search_local_knowledge
 Step 2: Check if results from knowledge base is sufficient to completely answer the question
-Step 3: If not, use web search (tavily_search_results_json) to find more information
+Step 3: If not, use web search  to find more information
 Step 4: If web search results are still insufficient, consider fetching specific pages for more detail
 Step 5: If all else fails, provide a fallback response indicating the lack of information
 
@@ -59,7 +59,7 @@ When you use `search_local_knowledge`, you must EVALUATE the returned content.
 
 IF LOCAL SEARCH FAILS OR IS VAGUE:
 1. Do NOT write a final answer yet.
-2. You MUST immediately call `tavily_search_results_json` to find the specific details on the web.
+2. You MUST use web search tool to find the specific details on the web.
 3. Only write your final response once you have concrete details or have exhausted all tool options.
 
 BAD RESPONSE: "The update includes fixes, check the notes."
