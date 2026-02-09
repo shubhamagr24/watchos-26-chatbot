@@ -226,25 +226,37 @@ class RAGKnowledgeBase:
             print(f"\n   ❌ Error creating vector store: {e}")
     
     def search(self, query: str, k: int = None, filter_dict: Dict = None) -> List[Dict[str, Any]]:
-        """Search the knowledge base for relevant chunks"""
+        """Search the knowledge base for relevant chunks with similarity threshold"""
         if not self.vectorstore:
             return []
         
         k = k or settings.DEFAULT_SEARCH_RESULTS
+        threshold = settings.RAG_SIMILARITY_THRESHOLD
         
         try:
+            # Use similarity_search_with_relevance_scores to get scores (0-1)
             if filter_dict:
-                results = self.vectorstore.similarity_search(query, k=k, filter=filter_dict)
+                results_with_scores = self.vectorstore.similarity_search_with_relevance_scores(
+                    query, k=k, filter=filter_dict
+                )
             else:
-                results = self.vectorstore.similarity_search(query, k=k)
+                results_with_scores = self.vectorstore.similarity_search_with_relevance_scores(
+                    query, k=k
+                )
             
             formatted_results = []
-            for doc in results:
-                formatted_results.append({
-                    'content': doc.page_content,
-                    'metadata': doc.metadata
-                })
+            for doc, score in results_with_scores:
+                # Only include results that meet the similarity threshold
+                if score >= threshold:
+                    formatted_results.append({
+                        'content': doc.page_content,
+                        'metadata': doc.metadata,
+                        'score': score
+                    })
             
+            if not formatted_results and results_with_scores:
+                print(f"DEBUG: {len(results_with_scores)} results found but all below threshold {threshold}. Top score: {results_with_scores[0][1]:.4f}")
+                
             return formatted_results
         except Exception as e:
             print(f"Error searching knowledge base: {e}")

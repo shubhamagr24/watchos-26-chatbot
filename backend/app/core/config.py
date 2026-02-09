@@ -48,6 +48,7 @@ class Settings:
     MAX_SEARCH_RESULTS = 10
     WEB_SEARCH_DEPTH = "advanced"
     WEB_SEARCH_MAX_RESULTS = 3
+    RAG_SIMILARITY_THRESHOLD = 0.7  # Filter for high-relevance docs
     
     # Server Settings
     HOST = "0.0.0.0"
