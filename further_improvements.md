@@ -1,7 +1,7 @@
 # WatchOS 26 Chatbot: Scalability & AI Roadmap
 
 ## 1. Advanced RAG & Retrieval
-- **Corrective RAG**: Implement a rag evaluator which checks the retivrived docs and query and if the docs are not relevant it will not pass the documents to the LLM.(Faced this issue due inprod as exixting kb was not very accurate)
+- **Corrective RAG**: Implement a rag evaluator which checks the retivrived docs and query and if the docs are not relevant it will not pass the documents to the LLM.(Faced this issue due in prod as exixting kb was not very accurate)
 - **Hybrid Search**: Combine ChromaDB vector search with BM25 keyword search to capture specific technical terms (e.g., specific API names or error codes).
 - **Multi-Query Retrieval**: Generate multiple variations of the user query to improve retrieval coverage.
 - **Reranking Step**: Implement a Cross-Encoder (e.g., Cohere or BGE) to rerank the top-k retrieved chunks for better precision.
