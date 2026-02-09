@@ -104,8 +104,8 @@ async def get_examples():
             {
                 "name": "Features",
                 "examples": [
-                    "What are the new features in Watch OS 26?",
-                    "Tell me about health monitoring features"
+                    "How to Track your medications on Apple Watch?",
+                    "How to Log state of mind on Apple Watch?"
                 ]
             },
             {
@@ -118,8 +118,8 @@ async def get_examples():
             {
                 "name": "Updates",
                 "examples": [
-                    "What's in Watch OS 26.3 update?",
-                    "What bugs were fixed?"
+                    "What's issues were resolved in Watch OS 26.2 update?",
+                    "What’s new in Apple Watch and watchOS 26 ??"
                 ]
             }
         ]
