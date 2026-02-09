@@ -3,10 +3,14 @@
 This directory contains the backend implementation for the WatchOS 26 Chatbot. It provides APIs, services, and utilities to support the chatbot's functionality.
 
 ## Features
-- FastAPI-based backend for high-performance asynchronous APIs.
-- Integration with a knowledge base for Apple Watch release notes and user guides.
-- Modular services for agent and retrieval-augmented generation (RAG).
-- Configuration-driven architecture for flexibility.
+- **LangGraph Agent**: A stateful agent that uses a cyclic graph to manage conversation flow and tool execution.
+- **Refined RAG Pipeline**: A sophisticated retrieval system that:
+  - Filters results based on similarity thresholds.
+  - Dynamically extracts relevant snippets using LLMs for borderline results.
+  - Reranks and formats results for optimal context delivery.
+- **FastAPI Backend**: High-performance asynchronous API endpoints.
+- **Integrated Tools**: Modular tools for local knowledge search, web searching (Tavily), and webpage fetching.
+- **Configuration-driven**: Easily adjustable thresholds, models, and chunking strategies.
 
 ## Folder Structure
 ```

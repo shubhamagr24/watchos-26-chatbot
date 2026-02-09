@@ -1,12 +1,14 @@
 """
 RAG Knowledge Base Service
 """
-from typing import List, Dict, Any
+from typing import List, Dict, Any, TypedDict, Annotated, Sequence
 from pathlib import Path
 import json
 
-from langchain_openai import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import Chroma
+from langchain_core.messages import SystemMessage, HumanMessage
+from langgraph.graph import StateGraph, END
 
 from app.core.config import settings
 from app.utils.text_processing import (
@@ -283,3 +285,96 @@ class RAGKnowledgeBase:
 # Initialize RAG Knowledge Base (singleton)
 print("\n🚀 Initializing Watch OS 26 Knowledge Base...")
 rag_kb = RAGKnowledgeBase()
+
+
+# --- RAG Refinement Graph Implementation ---
+
+class RAGState(TypedDict):
+    """State for the RAG refinement graph"""
+    query: str
+    doc_type: str
+    version: str
+    k: int
+    raw_docs: List[Dict[str, Any]]
+    refined_docs: List[Dict[str, Any]]
+
+
+def retrieve_node(state: RAGState):
+    """Retrieve documents from the vector store"""
+    query = state["query"]
+    doc_type = state.get("doc_type")
+    version = state.get("version")
+    k = state.get("k") or settings.REFINEMENT_MAX_DOCS
+    
+    if version:
+        results = rag_kb.search_by_version(query, version, k=k)
+    elif doc_type:
+        results = rag_kb.search_by_doc_type(query, doc_type, k=k)
+    else:
+        results = rag_kb.search(query, k=k)
+        
+    return {"raw_docs": results}
+
+
+def refine_node(state: RAGState):
+    """Refine retrieved documents based on similarity scores"""
+    query = state["query"]
+    raw_docs = state["raw_docs"]
+    refined_docs = []
+    
+    llm = ChatOpenAI(
+        model=settings.REFINEMENT_MODEL,
+        temperature=0,  # Stable extraction
+        api_key=settings.OPENAI_API_KEY
+    )
+    
+    for doc in raw_docs:
+        score = doc.get('score', 0)
+        content = doc.get('content', '')
+        
+        # Highly relevant: Keep as-is
+        if score > settings.REFINEMENT_SIMILARITY_MAX:
+            refined_docs.append(doc)
+            
+        # Borderline relevance: Use LLM to extract relevant snippets
+        elif score >= settings.REFINEMENT_SIMILARITY_MIN:
+            system_prompt = (
+                "You are an expert at extracting relevant information. "
+                "Given a user query and a document, extract ONLY the specific sentences or paragraphs "
+                "that are directly relevant to answering the query. "
+                "If the document is NOT relevant at all, reply with exactly 'NONE'. "
+                "Maintain the original wording and formatting as much as possible."
+            )
+            user_msg = f"User Query: {query}\n\nDocument:\n{content}"
+            
+            response = llm.invoke([
+                SystemMessage(content=system_prompt),
+                HumanMessage(content=user_msg)
+            ])
+            
+            extracted_content = response.content.strip()
+            
+            if extracted_content != "NONE":
+                # Create a refined version of the doc
+                refined_doc = doc.copy()
+                refined_doc['content'] = extracted_content
+                refined_doc['is_refined'] = True
+                refined_docs.append(refined_doc)
+        
+        # score < REFINEMENT_SIMILARITY_MIN: Filtered out (not added to refined_docs)
+    
+    return {"refined_docs": refined_docs}
+
+
+# Assemble the RAG Refinement Graph
+rag_workflow = StateGraph(RAGState)
+
+rag_workflow.add_node("retrieve", retrieve_node)
+rag_workflow.add_node("refine", refine_node)
+
+rag_workflow.set_entry_point("retrieve")
+rag_workflow.add_edge("retrieve", "refine")
+rag_workflow.add_edge("refine", END)
+
+# Compile the refinement graph
+rag_refinement_graph = rag_workflow.compile()

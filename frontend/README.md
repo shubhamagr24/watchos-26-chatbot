@@ -38,16 +38,15 @@ This is the frontend application for the WatchOS-26 Chatbot. It provides the use
 
 1. Run the application:
    ```bash
-   python app.py
+   streamlit run app.py
    ```
 
-2. Open your browser and navigate to the provided URL (e.g., `http://127.0.0.1:5000`).
+2. Open your browser and navigate to the provided URL (e.g., `http://localhost:8501`).
 
 ## File Structure
-- `app.py`: Entry point for the frontend application.
-- `main.py`: Contains the main logic for the frontend.
-- `requirements.txt`: Lists the dependencies for the project.
-- `.env.example`: Example environment variables file.
+- `app.py`: Main Streamlit application entry point.
+- `requirements.txt`: Project dependencies.
+- `.env.example`: Template for environment variables.
 
 ## Contributing
 Contributions are welcome! Please fork the repository and create a pull request with your changes.

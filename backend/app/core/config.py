@@ -48,7 +48,11 @@ class Settings:
     MAX_SEARCH_RESULTS = 10
     WEB_SEARCH_DEPTH = "advanced"
     WEB_SEARCH_MAX_RESULTS = 3
-    RAG_SIMILARITY_THRESHOLD = 0.7  # Filter for high-relevance docs
+    RAG_SIMILARITY_THRESHOLD = 0.6  # Filter for high-relevance docs
+    REFINEMENT_SIMILARITY_MIN = 0.6
+    REFINEMENT_SIMILARITY_MAX = 0.8
+    REFINEMENT_MAX_DOCS = 3
+    REFINEMENT_MODEL = "gpt-4o-mini"
     
     # Server Settings
     HOST = "0.0.0.0"

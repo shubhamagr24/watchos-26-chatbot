@@ -20,21 +20,22 @@ Welcome to the WatchOS 26 Chatbot repository! This project is an AI-powered chat
 
 ## Overview
 
-The WatchOS 26 Chatbot is a conversational assistant that provides:
-- Insights into WatchOS 26 features.
-- Answers to frequently asked questions.
-- Information from release notes and user guides.
-- Web search fallback for additional queries.
+The WatchOS 26 Chatbot is an advanced conversational assistant powered by **LangGraph**, providing:
+- **Intelligent Reasoning**: Decision-making agent for selecting between local knowledge and web search.
+- **Insights into WatchOS 26**: Precise information about features, release notes, and user guides.
+- **Refined RAG**: Multi-stage retrieval pipeline with LLM-based snippet extraction.
+- **Web Search Fallback**: Tavily integration for queries not covered in the local knowledge base.
 
 ---
 
 ## Features
 
-- **Local Knowledge Base**: Uses preloaded data from release notes and user guides.
-- **Web Search Integration**: Fallback to web search for queries not covered in the knowledge base.
-- **Streamlit Frontend**: Interactive and user-friendly interface.
-- **FastAPI Backend**: Robust and scalable backend API.
-- **CORS Configuration**: Secure communication between frontend and backend.
+- **LangGraph Agent**: Orchestrates the conversation flow and tool usage (RAG vs Web Search).
+- **Refined RAG Pipeline**: Uses a multi-step Retrieve -> Refine process with similarity thresholding and LLM-assisted extraction for high-precision answers.
+- **Local Knowledge Base**: Preloaded JSON and Markdown data from official Apple support and developer docs.
+- **Web Search Integration**: Fallback to web search when the knowledge base lacks sufficient information.
+- **Streamlit Frontend**: Responsive, interactive UI with tool usage visibility.
+- **FastAPI Backend**: Asynchronous API with comprehensive health and stats monitoring.
 
 ---
 

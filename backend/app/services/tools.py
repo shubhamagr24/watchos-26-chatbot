@@ -8,7 +8,7 @@ from langchain_core.tools import tool
 
 from langchain_community.tools.tavily_search import TavilySearchResults
 
-from app.services.rag_service import rag_kb
+from app.services.rag_service import rag_kb, rag_refinement_graph
 from app.core.config import settings
 
 
@@ -32,25 +32,34 @@ def search_local_knowledge(query: str, doc_type: str = None, version: str = None
         return "Knowledge base not available. Please use web search instead."
     
     try:
-        k = k or settings.DEFAULT_SEARCH_RESULTS
+        # Prepare inputs for the refinement graph
+        # Note: k is handled inside the graph if not provided
+        inputs = {
+            "query": query,
+            "doc_type": doc_type,
+            "version": version,
+            "k": k
+        }
         
-        # Search with appropriate filters
-        if version:
-            results = rag_kb.search_by_version(query, version, k=k)
-        elif doc_type:
-            results = rag_kb.search_by_doc_type(query, doc_type, k=k)
-        else:
-            results = rag_kb.search(query, k=k)
+        # Invoke the LangGraph RAG refinement pipeline
+        graph_result = rag_refinement_graph.invoke(inputs)
+        results = graph_result.get("refined_docs", [])
         
         if not results:
-            return "No relevant information found in knowledge base. Consider using web search."
+            return (
+                "No relevant information found in the Watch OS 26 knowledge base for your specific query. "
+                "--- ADVICE ---\n"
+                "The local knowledge base does not contain direct answers for this. "
+                "Please use the web_search_tool or browse URLs with fetch_webpage to find the details."
+            )
         
         # Format results
-        formatted = "=== From Watch OS 26 Knowledge Base ===\n\n"
+        formatted = "=== From Watch OS 26 Knowledge Base (Optimized & Refined) ===\n\n"
         
-        for i, result in enumerate(results[:k], 1):
-            metadata = result['metadata']
-            content = result['content']
+        for i, result in enumerate(results, 1):
+            metadata = result.get('metadata', {})
+            content = result.get('content', '')
+            is_refined = result.get('is_refined', False)
             
             formatted += f"[Source {i}] "
             
@@ -61,11 +70,14 @@ def search_local_knowledge(query: str, doc_type: str = None, version: str = None
             else:
                 formatted += metadata.get('title', 'Untitled')
             
+            if is_refined:
+                formatted += " (Extracted Relevant Snippet)"
+            
             formatted += "\n"
             formatted += f"Type: {metadata.get('doc_type', 'N/A')}\n"
             formatted += f"URL: {metadata.get('url', 'N/A')}\n"
             
-            if metadata.get('total_chunks', 1) > 1:
+            if not is_refined and metadata.get('total_chunks', 1) > 1:
                 formatted += f"Part: {metadata.get('chunk_index', 0) + 1}/{metadata.get('total_chunks')}\n"
             
             formatted += f"\nContent:\n{content}\n"
@@ -74,7 +86,7 @@ def search_local_knowledge(query: str, doc_type: str = None, version: str = None
         return formatted
     
     except Exception as e:
-        return f"Error searching knowledge base: {str(e)}"
+        return f"Error during refined knowledge search: {str(e)}"
 
 
 @tool
