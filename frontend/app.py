@@ -147,8 +147,9 @@ if "messages" not in st.session_state:
 if "backend_health" not in st.session_state:
     st.session_state.backend_health = check_backend_health()
 
+# Set 'show_metadata' to True by default
 if "show_metadata" not in st.session_state:
-    st.session_state.show_metadata = False
+    st.session_state.show_metadata = True
 
 
 # ============================================================================
